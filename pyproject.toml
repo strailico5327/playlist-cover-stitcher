@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [project.scripts]
-playlist-cover-stitcher = "playlist_cover_stitcher.app:main"
+playlist-cover-stitcher = "playlist_cover_stitcher:main"
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.setuptools]
+py-modules = ["playlist_cover_stitcher"]

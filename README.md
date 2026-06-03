@@ -28,18 +28,12 @@ playlist-cover-stitcher/
   .gitignore
   LICENSE
   README.md
-  main.py
+  playlist_cover_stitcher.py
   pyproject.toml
   requirements.txt
-  src/
-    playlist_cover_stitcher/
-      __init__.py
-      __main__.py
-      app.py
 ```
 
-`main.py` is kept as a compatibility launcher, while the application source
-lives under `src/playlist_cover_stitcher/`.
+`playlist_cover_stitcher.py` is the application source and entry point.
 
 ## Dependencies
 
@@ -62,7 +56,7 @@ python -m pip install -r requirements.txt
 Run from the repository root:
 
 ```powershell
-python main.py
+python playlist_cover_stitcher.py
 ```
 
 For package-style execution, first install the project in editable mode:
@@ -71,13 +65,7 @@ For package-style execution, first install the project in editable mode:
 python -m pip install -e .
 ```
 
-Then run the package module:
-
-```powershell
-python -m playlist_cover_stitcher
-```
-
-The editable install also provides the console script:
+The editable install provides the console script:
 
 ```powershell
 playlist-cover-stitcher
@@ -88,13 +76,13 @@ playlist-cover-stitcher
 Generate sample input images and a stitched smoke-test PNG:
 
 ```powershell
-python main.py --self-test
+python playlist_cover_stitcher.py --self-test
 ```
 
 Check drag-and-drop availability:
 
 ```powershell
-python main.py --check-dnd
+python playlist_cover_stitcher.py --check-dnd
 ```
 
 Drag-and-drop is provided by Qt, so no extra drag-drop package is required.

@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 from PySide6.QtCore import QBuffer, QIODevice, QPoint, Qt, Signal
-from PySide6.QtGui import QAction, QColor, QDragEnterEvent, QDropEvent, QFont, QImage, QMouseEvent, QPainter, QPen, QPixmap
+from PySide6.QtGui import QAction, QColor, QDragEnterEvent, QDropEvent, QFont, QImage, QMouseEvent, QPainter, QPalette, QPen, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QDialog,
@@ -33,22 +33,17 @@ except ImportError as exc:
 
 
 APP_NAME = "Playlist Cover Stitcher"
-ABOUT_TEXT = """TTF to WOFF2 Converter
+ABOUT_TEXT = """Playlist Cover Stitcher
 © 2026 strailico5327
 
-Licensed under GNU GPLv3.
-Developed with assistance from OpenAI Codex."""
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+Stitch four square album covers into one 1000x1000 playlist cover.
+
+Licensed under GNU GPLv3."""
+PROJECT_ROOT = Path(__file__).resolve().parent
 OUTPUT_SIZE = 1000
 OUTPUT_TILE = OUTPUT_SIZE // 2
 PREVIEW_TILE = 260
 PREVIEW_SIZE = PREVIEW_TILE * 2
-WINDOW_BG = "#f3f3f3"
-SURFACE_BG = "#ffffff"
-GRID_EMPTY_BG = "#fafafa"
-BORDER_COLOR = "#d0d0d0"
-TEXT_COLOR = "#202020"
-MUTED_TEXT_COLOR = "#5f5f5f"
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tif", ".tiff"}
 SUPPORTED_TYPES = "Images (*.png *.jpg *.jpeg *.webp *.bmp *.tif *.tiff);;PNG (*.png);;JPEG (*.jpg *.jpeg);;All files (*.*)"
 
@@ -154,8 +149,15 @@ class GridCanvas(QWidget):
 
     def paintEvent(self, _event) -> None:
         painter = QPainter(self)
-        painter.fillRect(self.rect(), QColor(SURFACE_BG))
-        painter.setPen(QPen(QColor(BORDER_COLOR), 1))
+        palette = self.palette()
+        base_color = palette.color(QPalette.ColorRole.Base)
+        empty_color = palette.color(QPalette.ColorRole.AlternateBase)
+        border_color = palette.color(QPalette.ColorRole.Mid)
+        muted_color = palette.color(QPalette.ColorRole.Mid)
+        text_color = palette.color(QPalette.ColorRole.Text)
+
+        painter.fillRect(self.rect(), base_color)
+        painter.setPen(QPen(border_color, 1))
         pixel_ratio = max(self.devicePixelRatioF(), 1.0)
         render_tile = max(PREVIEW_TILE, int(PREVIEW_TILE * pixel_ratio))
 
@@ -175,17 +177,17 @@ class GridCanvas(QWidget):
                 painter.drawRect(x, y, PREVIEW_TILE, PREVIEW_TILE)
                 continue
 
-            painter.fillRect(x, y, PREVIEW_TILE, PREVIEW_TILE, QColor(GRID_EMPTY_BG))
+            painter.fillRect(x, y, PREVIEW_TILE, PREVIEW_TILE, empty_color)
             painter.drawRect(x, y, PREVIEW_TILE, PREVIEW_TILE)
             number_font = QFont("Segoe UI Variable Display", 26, QFont.Weight.Bold)
             painter.setFont(number_font)
-            painter.setPen(QColor("#8a8a8a"))
+            painter.setPen(muted_color)
             painter.drawText(rect.adjusted(0, -36, 0, -18), Qt.AlignmentFlag.AlignCenter, str(index + 1))
             label_font = QFont("Segoe UI Variable Text", 11)
             painter.setFont(label_font)
-            painter.setPen(QColor(MUTED_TEXT_COLOR))
+            painter.setPen(text_color)
             painter.drawText(rect.adjusted(0, 22, 0, 0), Qt.AlignmentFlag.AlignCenter, "Click, drop, or paste")
-            painter.setPen(QPen(QColor(BORDER_COLOR), 1))
+            painter.setPen(QPen(border_color, 1))
 
     def cell_from_xy(self, x: int, y: int) -> int | None:
         if not (0 <= x < PREVIEW_SIZE and 0 <= y < PREVIEW_SIZE):
@@ -310,8 +312,8 @@ class PlaylistCoverStitcher(QMainWindow):
         self.setStyleSheet(
             """
             QWidget {
-                background: #f3f3f3;
-                color: #202020;
+                background: palette(window);
+                color: palette(window-text);
                 font-family: "Segoe UI Variable Text", "Segoe UI";
                 font-size: 10pt;
             }
@@ -321,8 +323,8 @@ class PlaylistCoverStitcher(QMainWindow):
                 font-weight: 700;
             }
             GridCanvas {
-                background: #ffffff;
-                border: 1px solid #d0d0d0;
+                background: palette(base);
+                border: 1px solid palette(mid);
             }
             QPushButton {
                 padding: 8px 16px;
@@ -340,7 +342,7 @@ class PlaylistCoverStitcher(QMainWindow):
                 font-size: 13pt;
             }
             QLabel#statusLabel {
-                color: #5f5f5f;
+                color: palette(window-text);
             }
             """
         )
