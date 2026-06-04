@@ -29,7 +29,9 @@ htmlcov/
 .vscode/
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Tool output
 smoke_test_output/
 *.log
+/version_info.txt

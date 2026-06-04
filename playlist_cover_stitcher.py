@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 from PySide6.QtCore import QBuffer, QIODevice, QPoint, Qt, Signal
-from PySide6.QtGui import QAction, QColor, QDragEnterEvent, QDropEvent, QFont, QImage, QMouseEvent, QPainter, QPalette, QPen, QPixmap
+from PySide6.QtGui import QAction, QColor, QDragEnterEvent, QDropEvent, QFont, QIcon, QImage, QMouseEvent, QPainter, QPalette, QPen, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QDialog,
@@ -33,10 +33,11 @@ except ImportError as exc:
 
 
 APP_NAME = "Playlist Cover Stitcher"
+APP_ICON = "assets/PlaylistCoverStitcher.ico"
 ABOUT_TEXT = """Playlist Cover Stitcher
 © 2026 strailico5327
 
-Stitch four square album covers into one 1000x1000 playlist cover.
+Stitch four album covers into one image for local music players.
 
 Licensed under GNU GPLv3."""
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -46,6 +47,11 @@ PREVIEW_TILE = 260
 PREVIEW_SIZE = PREVIEW_TILE * 2
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tif", ".tiff"}
 SUPPORTED_TYPES = "Images (*.png *.jpg *.jpeg *.webp *.bmp *.tif *.tiff);;PNG (*.png);;JPEG (*.jpg *.jpeg);;All files (*.*)"
+
+
+def resource_path(relative_path: str) -> Path:
+    base_path = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
+    return base_path / relative_path
 
 
 def enable_high_dpi_support() -> None:
@@ -614,7 +620,12 @@ def main() -> None:
         check_dnd()
         return
     app = QApplication(sys.argv)
+    app_icon = QIcon(str(resource_path(APP_ICON)))
+    if not app_icon.isNull():
+        app.setWindowIcon(app_icon)
     window = PlaylistCoverStitcher()
+    if not app_icon.isNull():
+        window.setWindowIcon(app_icon)
     window.show()
     sys.exit(app.exec())
 
