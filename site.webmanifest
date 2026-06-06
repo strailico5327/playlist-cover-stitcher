@@ -1,0 +1,21 @@
+{
+  "name": "Playlist Cover Stitcher",
+  "short_name": "Cover Stitcher",
+  "description": "Create a 1000x1000 playlist cover from four square-cropped album covers.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#151719",
+  "theme_color": "#202428",
+  "icons": [
+    {
+      "src": "assets/4-necomini-green_128x.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/4-necomini-green_192x.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

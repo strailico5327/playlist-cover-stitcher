@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>Playlist Cover Stitcher</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/4-necomini-green_32x.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/4-necomini-green_180x.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <img class="brand-icon" src="assets/4-necomini-green_192x.png" alt="">
+          <h1 id="app-title">Playlist Cover Stitcher</h1>
+        </div>
+      </header>
+
+      <section class="workspace" aria-labelledby="app-title">
+        <section class="cover-panel" aria-label="Playlist cover grid">
+          <div class="cover-grid" id="cover-grid" aria-label="Playlist cover grid">
+            <button class="tile" data-index="0" type="button" aria-label="Choose image for tile 1">
+              <span class="tile-empty"><strong>1</strong><span>Click, drop, or paste</span></span>
+            </button>
+            <button class="tile" data-index="1" type="button" aria-label="Choose image for tile 2">
+              <span class="tile-empty"><strong>2</strong><span>Click, drop, or paste</span></span>
+            </button>
+            <button class="tile" data-index="2" type="button" aria-label="Choose image for tile 3">
+              <span class="tile-empty"><strong>3</strong><span>Click, drop, or paste</span></span>
+            </button>
+            <button class="tile" data-index="3" type="button" aria-label="Choose image for tile 4">
+              <span class="tile-empty"><strong>4</strong><span>Click, drop, or paste</span></span>
+            </button>
+          </div>
+        </section>
+
+        <section class="controls-panel" aria-label="Actions">
+          <div class="control-group">
+            <span class="label">Output</span>
+            <button class="primary-button" id="export-button" type="button">Export PNG</button>
+          </div>
+
+          <div class="button-stack">
+            <button id="add-button" class="secondary-button" type="button">Add images</button>
+            <button id="shuffle-button" class="secondary-button" type="button">Shuffle</button>
+            <button id="clear-button" class="secondary-button" type="button">Clear</button>
+          </div>
+
+          <p class="status" id="status" role="status" aria-live="polite">Waiting for images</p>
+        </section>
+
+        <section class="helper-panel" aria-label="Cover instructions">
+          <div class="drop-helper">
+            <span class="drop-symbol" aria-hidden="true">+</span>
+            <h2>Build a 1000x1000 cover</h2>
+            <p>Click a tile, drop images, right-click a tile, or paste from the clipboard.</p>
+          </div>
+        </section>
+      </section>
+
+      <footer class="legal">
+        <span>Copyright (C) 2026 strailico5327</span>
+        <span>GNU GPLv3. This program comes with no warranty.</span>
+        <span>Files are processed locally in your browser.</span>
+      </footer>
+    </main>
+
+    <input id="single-file-input" type="file" accept="image/png,image/jpeg,image/webp,image/bmp" hidden>
+    <input id="bulk-file-input" type="file" accept="image/png,image/jpeg,image/webp,image/bmp" multiple hidden>
+
+    <menu class="context-menu" id="tile-menu">
+      <button id="paste-menu-item" type="button">Paste into tile</button>
+      <button id="delete-menu-item" type="button">Delete tile</button>
+    </menu>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
