@@ -10,7 +10,6 @@ const SUPPORTED_EXTENSIONS = /\.(png|jpe?g|webp|bmp)$/i;
 
 const tiles = Array.from(document.querySelectorAll(".tile"));
 const grid = document.querySelector("#cover-grid");
-const statusEl = document.querySelector("#status");
 const singleFileInput = document.querySelector("#single-file-input");
 const bulkFileInput = document.querySelector("#bulk-file-input");
 const exportButton = document.querySelector("#export-button");
@@ -28,8 +27,7 @@ const state = {
   pointerStart: null,
 };
 
-function setStatus(message) {
-  statusEl.textContent = message;
+function setStatus() {
 }
 
 function tileIndexFromEvent(event) {

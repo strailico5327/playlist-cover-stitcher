@@ -3,7 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="light">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#f6f7f5" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0f1211" media="(prefers-color-scheme: dark)">
     <title>Playlist Cover Stitcher</title>
     <link rel="icon" type="image/png" sizes="32x32" href="assets/4-necomini-green_32x.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/4-necomini-green_180x.png">
@@ -48,13 +50,11 @@
             <button id="shuffle-button" class="secondary-button" type="button">Shuffle</button>
             <button id="clear-button" class="secondary-button" type="button">Clear</button>
           </div>
-
-          <p class="status" id="status" role="status" aria-live="polite">Waiting for images</p>
         </section>
 
         <section class="helper-panel" aria-label="Cover instructions">
           <div class="drop-helper">
-            <span class="drop-symbol" aria-hidden="true">+</span>
+            <strong class="drop-symbol">+</strong>
             <h2>Build a 1000x1000 cover</h2>
             <p>Click a tile, drop images, right-click a tile, or paste from the clipboard.</p>
           </div>
