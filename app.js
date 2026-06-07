@@ -14,16 +14,13 @@ const singleFileInput = document.querySelector("#single-file-input");
 const bulkFileInput = document.querySelector("#bulk-file-input");
 const exportButton = document.querySelector("#export-button");
 const addButton = document.querySelector("#add-button");
+const pasteButton = document.querySelector("#paste-button");
 const shuffleButton = document.querySelector("#shuffle-button");
 const clearButton = document.querySelector("#clear-button");
-const menu = document.querySelector("#tile-menu");
-const pasteMenuItem = document.querySelector("#paste-menu-item");
-const deleteMenuItem = document.querySelector("#delete-menu-item");
 
 const state = {
   tiles: [null, null, null, null],
-  selectedIndex: 0,
-  contextIndex: 0,
+  selectedIndex: null,
   pointerStart: null,
 };
 
@@ -39,8 +36,26 @@ function firstEmptyIndex() {
   return state.tiles.findIndex((tile) => tile === null);
 }
 
+function pasteStartIndex() {
+  return Number.isInteger(state.selectedIndex) ? state.selectedIndex : 0;
+}
+
+function selectTile(index) {
+  state.selectedIndex = index;
+  tiles.forEach((tile, tileIndex) => {
+    tile.classList.toggle("selected-tile", tileIndex === index);
+  });
+}
+
 function isSupportedFile(file) {
   return SUPPORTED_TYPES.has(file.type) || SUPPORTED_EXTENSIONS.test(file.name);
+}
+
+function extensionFromMimeType(mimeType) {
+  if (mimeType === "image/jpeg") {
+    return "jpg";
+  }
+  return mimeType.split("/")[1] || "png";
 }
 
 async function loadBitmap(file) {
@@ -149,6 +164,28 @@ async function fillEmptyTiles(files) {
   setStatus(`Randomly placed ${loaded} image(s) into empty grid tiles.`);
 }
 
+async function pasteFilesInOrder(files, startIndex = pasteStartIndex()) {
+  const imageFiles = files.filter(isSupportedFile);
+  if (!imageFiles.length) {
+    setStatus("Clipboard has no image or copied image file.");
+    return;
+  }
+
+  let loaded = 0;
+  for (let offset = 0; offset < imageFiles.length; offset += 1) {
+    const targetIndex = startIndex + offset;
+    if (targetIndex >= state.tiles.length) {
+      break;
+    }
+    loaded += (await loadFileIntoTile(imageFiles[offset], targetIndex, { showErrors: false })) ? 1 : 0;
+  }
+
+  if (loaded) {
+    selectTile(startIndex);
+    setStatus(`Pasted ${loaded} image(s) starting at Grid ${startIndex + 1}.`);
+  }
+}
+
 async function filesFromEntry(entry) {
   if (!entry) {
     return [];
@@ -183,41 +220,42 @@ async function filesFromDataTransfer(dataTransfer) {
   return Array.from(dataTransfer.files || []);
 }
 
-async function pasteIntoTile(index) {
-  if (navigator.clipboard?.read) {
-    try {
-      const clipboardItems = await navigator.clipboard.read();
-      for (const item of clipboardItems) {
-        const type = item.types.find((mimeType) => SUPPORTED_TYPES.has(mimeType) || mimeType.startsWith("image/"));
-        if (type) {
-          const blob = await item.getType(type);
-          const file = new File([blob], "clipboard-image.png", { type });
-          await loadFileIntoTile(file, index);
-          setStatus(`Grid ${index + 1} pasted: clipboard image`);
-          return;
-        }
-      }
-    } catch {
-      setStatus("Clipboard read was blocked. Press Ctrl+V while the mouse is over a tile.");
-      return;
-    }
+function filesFromClipboardData(clipboardData) {
+  const files = Array.from(clipboardData?.files || []).filter(isSupportedFile);
+  if (files.length) {
+    return files;
   }
 
-  setStatus("Press Ctrl+V while the mouse is over a tile to paste an image.");
+  return Array.from(clipboardData?.items || [])
+    .map((item) => (item.kind === "file" ? item.getAsFile() : null))
+    .filter((file) => file && isSupportedFile(file));
 }
 
-function hideMenu() {
-  menu.classList.remove("open");
+async function filesFromClipboard() {
+  if (!navigator.clipboard?.read) {
+    setStatus("Clipboard read is not available. Press Ctrl+V instead.");
+    return [];
+  }
+
+  const clipboardItems = await navigator.clipboard.read();
+  const files = [];
+  for (const item of clipboardItems) {
+    const type = item.types.find((mimeType) => SUPPORTED_TYPES.has(mimeType) || mimeType.startsWith("image/"));
+    if (!type) {
+      continue;
+    }
+    const blob = await item.getType(type);
+    files.push(new File([blob], `clipboard-image-${files.length + 1}.${extensionFromMimeType(type)}`, { type }));
+  }
+  return files;
 }
 
-function showMenu(event, index) {
-  event.preventDefault();
-  state.contextIndex = index;
-  const x = Math.min(event.clientX, window.innerWidth - 190);
-  const y = Math.min(event.clientY, window.innerHeight - 92);
-  menu.style.left = `${Math.max(8, x)}px`;
-  menu.style.top = `${Math.max(8, y)}px`;
-  menu.classList.add("open");
+async function pasteFromClipboard() {
+  try {
+    await pasteFilesInOrder(await filesFromClipboard());
+  } catch {
+    setStatus("Clipboard read was blocked. Press Ctrl+V to paste instead.");
+  }
 }
 
 function exportPng() {
@@ -256,15 +294,8 @@ tiles.forEach((tile) => {
     if (index === null) {
       return;
     }
-    state.selectedIndex = index;
+    selectTile(index);
     singleFileInput.click();
-  });
-
-  tile.addEventListener("contextmenu", (event) => {
-    const index = tileIndexFromEvent(event);
-    if (index !== null) {
-      showMenu(event, index);
-    }
   });
 
   tile.addEventListener("pointerdown", (event) => {
@@ -355,25 +386,17 @@ window.addEventListener("drop", async (event) => {
 });
 
 window.addEventListener("paste", async (event) => {
-  const files = Array.from(event.clipboardData?.files || []).filter(isSupportedFile);
+  const files = filesFromClipboardData(event.clipboardData);
   if (!files.length) {
     setStatus("Clipboard has no image or copied image file.");
     return;
   }
-  const hovered = document.querySelector(".tile:hover");
-  const index = hovered ? Number(hovered.dataset.index) : state.selectedIndex;
-  await loadFileIntoTile(files[0], index);
-  setStatus(`Grid ${index + 1} pasted: ${files[0].name || "clipboard image"}`);
-});
-
-document.addEventListener("click", (event) => {
-  if (!event.target.closest(".context-menu")) {
-    hideMenu();
-  }
+  event.preventDefault();
+  await pasteFilesInOrder(files);
 });
 
 singleFileInput.addEventListener("change", async () => {
-  await loadFileIntoTile(singleFileInput.files[0], state.selectedIndex);
+  await loadFileIntoTile(singleFileInput.files[0], pasteStartIndex());
   singleFileInput.value = "";
 });
 
@@ -383,6 +406,7 @@ bulkFileInput.addEventListener("change", async () => {
 });
 
 addButton.addEventListener("click", () => bulkFileInput.click());
+pasteButton.addEventListener("click", pasteFromClipboard);
 exportButton.addEventListener("click", exportPng);
 shuffleButton.addEventListener("click", () => {
   if (state.tiles.some((tile) => tile === null)) {
@@ -401,22 +425,8 @@ shuffleButton.addEventListener("click", () => {
 
 clearButton.addEventListener("click", () => {
   state.tiles = [null, null, null, null];
+  state.selectedIndex = null;
+  tiles.forEach((tile) => tile.classList.remove("selected-tile"));
   renderAllTiles();
-  setStatus("Cleared. Click a tile, drag images in, right-click a tile, or press Ctrl+V.");
-});
-
-pasteMenuItem.addEventListener("click", async () => {
-  hideMenu();
-  await pasteIntoTile(state.contextIndex);
-});
-
-deleteMenuItem.addEventListener("click", () => {
-  hideMenu();
-  if (!state.tiles[state.contextIndex]) {
-    setStatus(`Grid ${state.contextIndex + 1} is already empty.`);
-    return;
-  }
-  state.tiles[state.contextIndex] = null;
-  renderTile(state.contextIndex);
-  setStatus(`Deleted image from Grid ${state.contextIndex + 1}.`);
+  setStatus("Cleared. Click a tile, drag images in, or press Ctrl+V.");
 });

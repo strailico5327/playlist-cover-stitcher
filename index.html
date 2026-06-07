@@ -40,23 +40,12 @@
         </section>
 
         <section class="controls-panel" aria-label="Actions">
-          <div class="control-group">
-            <span class="label">Output</span>
-            <button class="primary-button" id="export-button" type="button">Export PNG</button>
-          </div>
-
           <div class="button-stack">
             <button id="add-button" class="secondary-button" type="button">Add images</button>
+            <button id="paste-button" class="secondary-button" type="button">Paste</button>
             <button id="shuffle-button" class="secondary-button" type="button">Shuffle</button>
             <button id="clear-button" class="secondary-button" type="button">Clear</button>
-          </div>
-        </section>
-
-        <section class="helper-panel" aria-label="Cover instructions">
-          <div class="drop-helper">
-            <strong class="drop-symbol">+</strong>
-            <h2>Build a 1000x1000 cover</h2>
-            <p>Click a tile, drop images, right-click a tile, or paste from the clipboard.</p>
+            <button class="primary-button" id="export-button" type="button">Export PNG</button>
           </div>
         </section>
       </section>
@@ -70,11 +59,6 @@
 
     <input id="single-file-input" type="file" accept="image/png,image/jpeg,image/webp,image/bmp" hidden>
     <input id="bulk-file-input" type="file" accept="image/png,image/jpeg,image/webp,image/bmp" multiple hidden>
-
-    <menu class="context-menu" id="tile-menu">
-      <button id="paste-menu-item" type="button">Paste into tile</button>
-      <button id="delete-menu-item" type="button">Delete tile</button>
-    </menu>
 
     <script src="app.js" defer></script>
   </body>

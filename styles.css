@@ -18,7 +18,10 @@
   --accent-soft: #e8f7ef;
   --danger: #b13c3c;
   --shadow: 0 18px 45px rgba(30, 41, 59, 0.09);
-  --menu-shadow: 0 16px 42px rgba(25, 29, 33, 0.18);
+  --cover-column: 532px;
+  --side-column: 320px;
+  --layout-gap: 16px;
+  --layout-width: calc(var(--cover-column) + var(--layout-gap) + var(--side-column));
   font-family: Inter, "Segoe UI", "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
 }
 
@@ -39,11 +42,10 @@
     --button-hover: #19251f;
     --accent: #35c985;
     --accent-dark: #24a76d;
-    --accent-text: #06130d;
+    --accent-text: #ffffff;
     --accent-soft: #163326;
     --danger: #ff817d;
     --shadow: 0 18px 45px rgba(0, 0, 0, 0.36);
-    --menu-shadow: 0 16px 42px rgba(0, 0, 0, 0.42);
   }
 }
 
@@ -83,6 +85,8 @@ p {
 }
 
 .topbar {
+  width: min(100%, var(--layout-width));
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -116,15 +120,14 @@ h2 {
 
 .workspace {
   display: grid;
-  grid-template-columns: minmax(0, 532px) minmax(280px, 320px);
+  grid-template-columns: minmax(0, var(--cover-column)) minmax(280px, var(--side-column));
   justify-content: center;
   align-items: start;
-  gap: 16px;
+  gap: var(--layout-gap);
 }
 
 .cover-panel,
-.controls-panel,
-.helper-panel {
+.controls-panel {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -132,7 +135,6 @@ h2 {
 }
 
 .cover-panel {
-  grid-row: 1 / span 2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -182,7 +184,8 @@ h2 {
 }
 
 .tile.drag-over::after,
-.tile.swap-target::after {
+.tile.swap-target::after,
+.tile.selected-tile::after {
   position: absolute;
   content: "";
   inset: 0;
@@ -221,28 +224,8 @@ h2 {
   line-height: 1.2;
 }
 
-.drop-helper {
-  display: grid;
-  justify-items: center;
-  gap: 12px;
-  min-width: 0;
-  padding: 18px;
-  text-align: center;
-}
-
-.drop-helper p,
 .legal {
   color: var(--muted);
-}
-
-.drop-symbol {
-  display: block;
-  color: var(--accent);
-  font-family: Arial, sans-serif;
-  font-size: 42px;
-  font-weight: 700;
-  line-height: 1;
-  text-align: center;
 }
 
 .controls-panel {
@@ -254,21 +237,9 @@ h2 {
   padding: 16px;
 }
 
-.helper-panel {
-  grid-column: 2;
-  align-self: start;
-  min-width: 0;
-  padding: 16px;
-}
-
-.control-group,
 .button-stack {
   display: grid;
   gap: 10px;
-}
-
-.label {
-  font-weight: 700;
 }
 
 button,
@@ -299,6 +270,10 @@ button:active {
   background: var(--accent-dark);
 }
 
+#export-button {
+  margin-top: 8px;
+}
+
 .secondary-button {
   background: var(--button-bg);
   color: var(--text);
@@ -309,51 +284,27 @@ button:active {
   background: var(--button-hover);
 }
 
-.context-menu {
-  display: none;
-  position: fixed;
-  z-index: 20;
-  min-width: 180px;
-  margin: 0;
-  padding: 6px;
-  border: 1px solid var(--line);
-  background: var(--panel);
-  box-shadow: var(--menu-shadow);
-}
-
-.context-menu.open {
-  display: grid;
-}
-
-.context-menu button {
-  min-height: 36px;
-  padding: 8px 12px;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  text-align: left;
-}
-
-.context-menu button:last-child {
-  color: var(--danger);
-}
-
 .legal {
+  width: min(100%, var(--layout-width));
+  margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
   gap: 8px 18px;
-  padding: 18px 2px 0;
+  padding: 18px 0 0;
   font-size: 12px;
 }
 
 @media (max-width: 940px) {
+  :root {
+    --layout-width: var(--cover-column);
+  }
+
   .workspace {
-    grid-template-columns: minmax(0, 532px);
+    grid-template-columns: minmax(0, var(--cover-column));
     justify-content: center;
   }
 
-  .controls-panel,
-  .helper-panel {
+  .controls-panel {
     grid-column: auto;
     grid-row: auto;
     justify-self: center;
